@@ -2,6 +2,12 @@ name: Magic Prompt
 
 on:
   pull_request:
+  workflow_dispatch:
+    inputs:
+      prompt:
+        description: "Prompt to send to Claude"
+        required: true
+        type: string
 
 jobs:
   hello:
@@ -15,6 +21,6 @@ jobs:
           node-version: 22
 
       - run: npm install -g @anthropic-ai/claude-code
-      - run: claude -p "hello"
+      - run: claude -p "${{ github.event.inputs.prompt }}"
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
