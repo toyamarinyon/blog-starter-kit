@@ -12,15 +12,19 @@ on:
 jobs:
   hello:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-
       - run: npm install -g @anthropic-ai/claude-code
-      - run: claude -p "${{ github.event.inputs.prompt }}"
+
+      - name: Reasoning objective
+        run: |
+          objective=$(claude -p "The developer plans to "${{ github.event.inputs.prompt || 'Add author page' }}". Think why does developer plan that?")
+          echo "objective=${objective}" >> $GITHUB_OUTPUT
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+
+      - name: Echo Reasoning
+        run: echo ${{ steps.reasoning.outputs.objective }}
