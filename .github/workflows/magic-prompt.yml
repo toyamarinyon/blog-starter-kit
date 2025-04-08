@@ -12,15 +12,53 @@ on:
 jobs:
   hello:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-
       - run: npm install -g @anthropic-ai/claude-code
-      - run: claude -p "${{ github.event.inputs.prompt }}"
+
+      - name: analyze
+        id: analyze
+        run: |
+          reason=$(claude -p "
+            I need to analyze the developer's plan to ${{ github.event.inputs.prompt || 'Add author page' }}. Please provide your reasoning about:
+
+            Why might the developer be prioritizing it at this stage?
+            What business or user experience goals could it?
+
+            Please share your thought process and rationale behind why a developer would plan this feature next in their development roadmap.\
+            ")
+          echo $reason
+          echo "reason<<EOF" >> $GITHUB_OUTPUT
+          echo "$reason" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+
+      - name: plan
+        id: plan
+        run: |
+          plan=$(claude -p "
+            Please create a comprehensive development plan in markdown format with clear, actionable tasks. The plan should:
+
+            - Use proper markdown task list format (- [ ] Task description)
+            - Organize tasks in logical sections/phases
+            - Include estimated complexity for each task (if applicable)
+            - Highlight dependencies between tasks
+
+            The plan needs to address:
+            ${{ github.event.inputs.prompt || 'Add author page' }}
+
+
+            Context and reasoning behind these requirements:
+            ${{ steps.analyze.outputs.reason }}
+            ")
+
+          echo $plan
+          echo "plan<<EOF" >> $GITHUB_OUTPUT
+          echo "$plan" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
