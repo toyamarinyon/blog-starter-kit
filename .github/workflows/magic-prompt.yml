@@ -30,6 +30,7 @@ jobs:
 
             Please share your thought process and rationale behind why a developer would plan this feature next in their development roadmap.\
             ")
+          echo $reason
           echo "reason<<EOF" >> $GITHUB_OUTPUT
           echo "$reason" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
@@ -37,6 +38,7 @@ jobs:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
 
       - name: plan
+        id: plan
         run: |
           plan=$(claude -p "
             Please create a comprehensive development plan in markdown format with clear, actionable tasks. The plan should:
@@ -53,6 +55,8 @@ jobs:
             Context and reasoning behind these requirements:
             ${{ steps.analyze.outputs.reason }}
             ")
+
+          echo $plan
           echo "plan<<EOF" >> $GITHUB_OUTPUT
           echo "$plan" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
