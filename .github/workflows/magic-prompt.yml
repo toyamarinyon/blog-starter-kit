@@ -21,6 +21,7 @@ jobs:
 
       - name: Reasoning objective
         run: |
+          claude -p "The developer plans to "${{ github.event.inputs.prompt || 'Add author page' }}". Think why does developer plan that?"
           objective=$(claude -p "The developer plans to "${{ github.event.inputs.prompt || 'Add author page' }}". Think why does developer plan that?")
           echo "objective=${objective}" >> $GITHUB_OUTPUT
         env:
