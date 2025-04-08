@@ -29,9 +29,12 @@ jobs:
 
             Please share your thought process and rationale behind why a developer would plan this feature next in their development roadmap.\
             ")
-          echo "reason=${reason}" >> $GITHUB_OUTPUT
+          encoded=$(echo -n "$reason" | base64)
+          echo "reason=${encoded}" >> $GITHUB_OUTPUT
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
 
       - name: Echo Reasoning
-        run: echo ${{ steps.analyze.outputs.reason }}
+        run: |
+          decode=$(echo ${{ steps.analyze.outputs.reason }} | base64 --decode)
+          echo $decode
