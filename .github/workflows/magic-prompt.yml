@@ -36,6 +36,25 @@ jobs:
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
 
-      - name: Echo Reasoning
+      - name: plan
         run: |
-          echo "${{ steps.analyze.outputs.reason }}"
+          plan=$(claude -p "
+            Please create a comprehensive development plan in markdown format with clear, actionable tasks. The plan should:
+
+            - Use proper markdown task list format (- [ ] Task description)
+            - Organize tasks in logical sections/phases
+            - Include estimated complexity for each task (if applicable)
+            - Highlight dependencies between tasks
+
+            The plan needs to address:
+            ${{ github.event.inputs.prompt || 'Add author page' }}
+
+
+            Context and reasoning behind these requirements:
+            ${{ steps.analyze.outputs.reason }}
+            ")
+          echo "plan<<EOF" >> $GITHUB_OUTPUT
+          echo "$plan" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
