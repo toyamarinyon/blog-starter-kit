@@ -19,13 +19,20 @@ jobs:
           node-version: 22
       - run: npm install -g @anthropic-ai/claude-code
 
-      - name: Reasoning objective
+      - name: analyze
         run: |
-          claude -p "The developer plans to "${{ github.event.inputs.prompt || 'Add author page' }}". Think why does developer plan that?"
-          objective=$(claude -p "The developer plans to "${{ github.event.inputs.prompt || 'Add author page' }}". Think why does developer plan that?")
-          echo "objective=${objective}" >> $GITHUB_OUTPUT
+          claude -p "
+            I need to analyze the developer's plan to ${{ github.event.inputs.prompt || 'Add author page' }}. Please provide your reasoning about:
+
+            Why might the developer be prioritizing it at this stage?
+            What business or user experience goals could it?
+
+            Please share your thought process and rationale behind why a developer would plan this feature next in their development roadmap.\
+            "
+
+          echo "reason=${objective}" >> $GITHUB_OUTPUT
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
 
       - name: Echo Reasoning
-        run: echo ${{ steps.reasoning.outputs.objective }}
+        run: echo ${{ steps.analyze.outputs.reason }}
