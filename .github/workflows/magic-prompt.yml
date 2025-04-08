@@ -21,16 +21,15 @@ jobs:
 
       - name: analyze
         run: |
-          claude -p "
+          reason=$(claude -p "
             I need to analyze the developer's plan to ${{ github.event.inputs.prompt || 'Add author page' }}. Please provide your reasoning about:
 
             Why might the developer be prioritizing it at this stage?
             What business or user experience goals could it?
 
             Please share your thought process and rationale behind why a developer would plan this feature next in their development roadmap.\
-            "
-
-          echo "reason=${objective}" >> $GITHUB_OUTPUT
+            ")
+          echo "reason=${reason}" >> $GITHUB_OUTPUT
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
 
