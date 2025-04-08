@@ -20,6 +20,7 @@ jobs:
       - run: npm install -g @anthropic-ai/claude-code
 
       - name: analyze
+        id: analyze
         run: |
           reason=$(claude -p "
             I need to analyze the developer's plan to ${{ github.event.inputs.prompt || 'Add author page' }}. Please provide your reasoning about:
@@ -29,12 +30,12 @@ jobs:
 
             Please share your thought process and rationale behind why a developer would plan this feature next in their development roadmap.\
             ")
-          encoded=$(echo -n "$reason" | base64)
-          echo "reason=${encoded}" >> $GITHUB_OUTPUT
+          echo "reason<<EOF" >> $GITHUB_OUTPUT
+          echo "$reason" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
 
       - name: Echo Reasoning
         run: |
-          decode=$(echo ${{ steps.analyze.outputs.reason }} | base64 --decode)
-          echo $decode
+          echo "${{ steps.analyze.outputs.reason }}"
